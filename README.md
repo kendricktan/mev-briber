@@ -2,4 +2,4 @@
 
 Bribe a miner with WETH
 
-Deployed at: 0x5B7ED1Fe918EF0f627343f12E2279FDB4E1558f2
+Deployed at: 0xf26F7dAa038651F6eFcA888E91ecbeC8e231035e

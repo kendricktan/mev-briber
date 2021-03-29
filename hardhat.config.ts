@@ -6,7 +6,15 @@ import "@nomiclabs/hardhat-ethers";
 import "hardhat-typechain";
 
 const config: HardhatUserConfig = {
-  solidity: "0.7.3",
+  solidity: {
+    version: "0.7.3",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200
+      }
+    }
+  },
   networks: {
     localhost: {
       url: "http://127.0.0.1:8545",

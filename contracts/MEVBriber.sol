@@ -75,7 +75,7 @@ contract MEVBriber is FlashbotsCheckAndSend, EIP712 {
     for (uint256 i = 0; i < _targets.length; i++) {
       _check32Bytes(_targets[i], _payloads[i], _resultMatches[i]);
     }
-    WETH.transferFrom(msg.sender, address(this), _value);
+    WETH.transferFrom(_owner, address(this), _value);
     WETH.withdraw(_value);
     block.coinbase.transfer(_value);
 
@@ -96,7 +96,7 @@ contract MEVBriber is FlashbotsCheckAndSend, EIP712 {
   ) external {
     briberPermitted(_owner, _spender, _value, _deadline, _v, _r, _s);
     _checkBytes(_target, _payload, _resultMatch);
-    WETH.transferFrom(msg.sender, address(this), _value);
+    WETH.transferFrom(_owner, address(this), _value);
     WETH.withdraw(_value);
     block.coinbase.transfer(_value);
 
@@ -121,7 +121,7 @@ contract MEVBriber is FlashbotsCheckAndSend, EIP712 {
     for (uint256 i = 0; i < _targets.length; i++) {
       _checkBytes(_targets[i], _payloads[i], _resultMatches[i]);
     }
-    WETH.transferFrom(msg.sender, address(this), _value);
+    WETH.transferFrom(_owner, address(this), _value);
     WETH.withdraw(_value);
     block.coinbase.transfer(_value);
 
