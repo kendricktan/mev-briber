@@ -5,6 +5,10 @@ pragma experimental ABIEncoderV2;
 import "./FlashbotsCheckAndSend.sol";
 import "./interface/IWETH.sol";
 
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/drafts/EIP712.sol";
+
 /*
   Copyright 2021 Kendrick Tan (kendricktrh@gmail.com).
 
@@ -13,65 +17,154 @@ import "./interface/IWETH.sol";
   But needs to be approved beforehand.
 */
 
-contract MEVBriber is FlashbotsCheckAndSend {
-    IWETH public constant weth =
-        IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+contract MEVBriber is FlashbotsCheckAndSend, EIP712 {
+  using Counters for Counters.Counter;
 
-    receive() external payable {}
+  constructor() EIP712("MEVBriber", "1") {}
 
-    function check32BytesAndSendWETH(
-        uint256 _bribeAmount,
-        address _target,
-        bytes memory _payload,
-        bytes32 _resultMatch
-    ) external {
-        _check32Bytes(_target, _payload, _resultMatch);
-        weth.transferFrom(msg.sender, address(this), _bribeAmount);
-        weth.withdraw(_bribeAmount);
-        block.coinbase.transfer(_bribeAmount);
+  IWETH public constant WETH =
+    IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+
+  event Bribed(address indexed briber, address indexed miner, uint256 amount);
+
+  bytes32 public constant PERMIT_TYPEHASH =
+    keccak256(
+      "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
+    );
+
+  mapping(address => Counters.Counter) private _nonces;
+
+  receive() external payable {}
+
+  function check32BytesAndSendWETH(
+    address _owner,
+    address _spender,
+    uint256 _value,
+    uint256 _deadline,
+    uint8 _v,
+    bytes32 _r,
+    bytes32 _s,
+    address _target,
+    bytes memory _payload,
+    bytes32 _resultMatch
+  ) external {
+    briberPermitted(_owner, _spender, _value, _deadline, _v, _r, _s);
+    _check32Bytes(_target, _payload, _resultMatch);
+    WETH.transferFrom(_owner, address(this), _value);
+    WETH.withdraw(_value);
+    block.coinbase.transfer(_value);
+
+    emit Bribed(_owner, block.coinbase, _value);
+  }
+
+  function check32BytesAndSendMultiWETH(
+    address _owner,
+    address _spender,
+    uint256 _value,
+    uint256 _deadline,
+    uint8 _v,
+    bytes32 _r,
+    bytes32 _s,
+    address[] memory _targets,
+    bytes[] memory _payloads,
+    bytes32[] memory _resultMatches
+  ) external {
+    require(_targets.length == _payloads.length);
+    require(_targets.length == _resultMatches.length);
+    briberPermitted(_owner, _spender, _value, _deadline, _v, _r, _s);
+    for (uint256 i = 0; i < _targets.length; i++) {
+      _check32Bytes(_targets[i], _payloads[i], _resultMatches[i]);
     }
+    WETH.transferFrom(msg.sender, address(this), _value);
+    WETH.withdraw(_value);
+    block.coinbase.transfer(_value);
 
-    function check32BytesAndSendMultiWETH(
-        uint256 _bribeAmount,
-        address[] memory _targets,
-        bytes[] memory _payloads,
-        bytes32[] memory _resultMatches
-    ) external {
-        require(_targets.length == _payloads.length);
-        require(_targets.length == _resultMatches.length);
-        for (uint256 i = 0; i < _targets.length; i++) {
-            _check32Bytes(_targets[i], _payloads[i], _resultMatches[i]);
-        }
-        weth.transferFrom(msg.sender, address(this), _bribeAmount);
-        weth.withdraw(_bribeAmount);
-        block.coinbase.transfer(_bribeAmount);
-    }
+    emit Bribed(_owner, block.coinbase, _value);
+  }
 
-    function checkBytesAndSendWETH(
-        uint256 _bribeAmount,
-        address _target,
-        bytes memory _payload,
-        bytes memory _resultMatch
-    ) external {
-        _checkBytes(_target, _payload, _resultMatch);
-        weth.transferFrom(msg.sender, address(this), _bribeAmount);
-        weth.withdraw(_bribeAmount);
-        block.coinbase.transfer(_bribeAmount);
-    }
+  function checkBytesAndSendWETH(
+    address _owner,
+    address _spender,
+    uint256 _value,
+    uint256 _deadline,
+    uint8 _v,
+    bytes32 _r,
+    bytes32 _s,
+    address _target,
+    bytes memory _payload,
+    bytes memory _resultMatch
+  ) external {
+    briberPermitted(_owner, _spender, _value, _deadline, _v, _r, _s);
+    _checkBytes(_target, _payload, _resultMatch);
+    WETH.transferFrom(msg.sender, address(this), _value);
+    WETH.withdraw(_value);
+    block.coinbase.transfer(_value);
 
-    function checkBytesAndSendMultiWETH(
-        uint256 _bribeAmount,
-        address[] memory _targets,
-        bytes[] memory _payloads,
-        bytes[] memory _resultMatches
-    ) external {
-        require(_targets.length == _payloads.length);
-        require(_targets.length == _resultMatches.length);
-        for (uint256 i = 0; i < _targets.length; i++) {
-            _checkBytes(_targets[i], _payloads[i], _resultMatches[i]);
-        }
-        weth.transferFrom(msg.sender, address(this), _bribeAmount);
-        weth.withdraw(_bribeAmount);
-        block.coinbase.transfer(_bribeAmount);
+    emit Bribed(_owner, block.coinbase, _value);
+  }
+
+  function checkBytesAndSendMultiWETH(
+    address _owner,
+    address _spender,
+    uint256 _value,
+    uint256 _deadline,
+    uint8 _v,
+    bytes32 _r,
+    bytes32 _s,
+    address[] memory _targets,
+    bytes[] memory _payloads,
+    bytes[] memory _resultMatches
+  ) external {
+    require(_targets.length == _payloads.length);
+    require(_targets.length == _resultMatches.length);
+    briberPermitted(_owner, _spender, _value, _deadline, _v, _r, _s);
+    for (uint256 i = 0; i < _targets.length; i++) {
+      _checkBytes(_targets[i], _payloads[i], _resultMatches[i]);
     }
+    WETH.transferFrom(msg.sender, address(this), _value);
+    WETH.withdraw(_value);
+    block.coinbase.transfer(_value);
+
+    emit Bribed(_owner, block.coinbase, _value);
+  }
+
+  // Briber permit functionality
+  function briberPermitted(
+    address owner,
+    address spender,
+    uint256 value,
+    uint256 deadline,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) public {
+    // solhint-disable-next-line not-rely-on-time
+    require(block.timestamp <= deadline, "ERC20Permit: expired deadline");
+
+    bytes32 structHash =
+      keccak256(
+        abi.encode(
+          PERMIT_TYPEHASH,
+          owner,
+          spender,
+          value,
+          _nonces[owner].current(),
+          deadline
+        )
+      );
+
+    bytes32 hash = _hashTypedDataV4(structHash);
+
+    address signer = ECDSA.recover(hash, v, r, s);
+    require(signer == owner, "ERC20Permit: invalid signature");
+    require(spender == address(this), "ERC20Permit: invalid signature");
+
+    _nonces[owner].increment();
+  }
+
+  // **** Helpers ****
+
+  function nonces(address owner) public view virtual returns (uint256) {
+    return _nonces[owner].current();
+  }
 }

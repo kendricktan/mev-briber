@@ -24,6 +24,7 @@ const config: HardhatUserConfig = {
           : "http://127.0.0.1:8545",
       },
       blockGasLimit: 20000000,
+      chainId: 1,
     },
   },
   mocha: {

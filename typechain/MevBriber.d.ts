@@ -23,18 +23,38 @@ import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 
 interface MevBriberInterface extends ethers.utils.Interface {
   functions: {
+    "PERMIT_TYPEHASH()": FunctionFragment;
+    "WETH()": FunctionFragment;
+    "briberPermitted(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
     "check32BytesAndSend(address,bytes,bytes32)": FunctionFragment;
     "check32BytesAndSendMulti(address[],bytes[],bytes32[])": FunctionFragment;
-    "check32BytesAndSendMultiWETH(uint256,address[],bytes[],bytes32[])": FunctionFragment;
-    "check32BytesAndSendWETH(uint256,address,bytes,bytes32)": FunctionFragment;
+    "check32BytesAndSendMultiWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address[],bytes[],bytes32[])": FunctionFragment;
+    "check32BytesAndSendWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address,bytes,bytes32)": FunctionFragment;
     "checkBytesAndSend(address,bytes,bytes)": FunctionFragment;
     "checkBytesAndSendMulti(address[],bytes[],bytes[])": FunctionFragment;
-    "checkBytesAndSendMultiWETH(uint256,address[],bytes[],bytes[])": FunctionFragment;
-    "checkBytesAndSendWETH(uint256,address,bytes,bytes)": FunctionFragment;
-    "weth()": FunctionFragment;
+    "checkBytesAndSendMultiWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address[],bytes[],bytes[])": FunctionFragment;
+    "checkBytesAndSendWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address,bytes,bytes)": FunctionFragment;
+    "nonces(address)": FunctionFragment;
   };
 
   encodeFunctionData(
+    functionFragment: "PERMIT_TYPEHASH",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "WETH", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "briberPermitted",
+    values: [
+      string,
+      string,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BytesLike,
+      BytesLike
+    ]
+  ): string;
+  encodeFunctionData(
     functionFragment: "check32BytesAndSend",
     values: [string, BytesLike, BytesLike]
   ): string;
@@ -44,11 +64,33 @@ interface MevBriberInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "check32BytesAndSendMultiWETH",
-    values: [BigNumberish, string[], BytesLike[], BytesLike[]]
+    values: [
+      string,
+      string,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BytesLike,
+      BytesLike,
+      string[],
+      BytesLike[],
+      BytesLike[]
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "check32BytesAndSendWETH",
-    values: [BigNumberish, string, BytesLike, BytesLike]
+    values: [
+      string,
+      string,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BytesLike,
+      BytesLike,
+      string,
+      BytesLike,
+      BytesLike
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "checkBytesAndSend",
@@ -60,14 +102,45 @@ interface MevBriberInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "checkBytesAndSendMultiWETH",
-    values: [BigNumberish, string[], BytesLike[], BytesLike[]]
+    values: [
+      string,
+      string,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BytesLike,
+      BytesLike,
+      string[],
+      BytesLike[],
+      BytesLike[]
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "checkBytesAndSendWETH",
-    values: [BigNumberish, string, BytesLike, BytesLike]
+    values: [
+      string,
+      string,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BytesLike,
+      BytesLike,
+      string,
+      BytesLike,
+      BytesLike
+    ]
   ): string;
-  encodeFunctionData(functionFragment: "weth", values?: undefined): string;
+  encodeFunctionData(functionFragment: "nonces", values: [string]): string;
 
+  decodeFunctionResult(
+    functionFragment: "PERMIT_TYPEHASH",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "WETH", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "briberPermitted",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "check32BytesAndSend",
     data: BytesLike
@@ -100,9 +173,13 @@ interface MevBriberInterface extends ethers.utils.Interface {
     functionFragment: "checkBytesAndSendWETH",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "weth", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
 
-  events: {};
+  events: {
+    "Bribed(address,address,uint256)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "Bribed"): EventFragment;
 }
 
 export class MevBriber extends Contract {
@@ -119,6 +196,52 @@ export class MevBriber extends Contract {
   interface: MevBriberInterface;
 
   functions: {
+    PERMIT_TYPEHASH(
+      overrides?: CallOverrides
+    ): Promise<{
+      0: string;
+    }>;
+
+    "PERMIT_TYPEHASH()"(
+      overrides?: CallOverrides
+    ): Promise<{
+      0: string;
+    }>;
+
+    WETH(
+      overrides?: CallOverrides
+    ): Promise<{
+      0: string;
+    }>;
+
+    "WETH()"(
+      overrides?: CallOverrides
+    ): Promise<{
+      0: string;
+    }>;
+
+    briberPermitted(
+      owner: string,
+      spender: string,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "briberPermitted(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+      owner: string,
+      spender: string,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     check32BytesAndSend(
       _target: string,
       _payload: BytesLike,
@@ -148,15 +271,27 @@ export class MevBriber extends Contract {
     ): Promise<ContractTransaction>;
 
     check32BytesAndSendMultiWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "check32BytesAndSendMultiWETH(uint256,address[],bytes[],bytes32[])"(
-      _bribeAmount: BigNumberish,
+    "check32BytesAndSendMultiWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address[],bytes[],bytes32[])"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
@@ -164,15 +299,27 @@ export class MevBriber extends Contract {
     ): Promise<ContractTransaction>;
 
     check32BytesAndSendWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "check32BytesAndSendWETH(uint256,address,bytes,bytes32)"(
-      _bribeAmount: BigNumberish,
+    "check32BytesAndSendWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address,bytes,bytes32)"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
@@ -208,15 +355,27 @@ export class MevBriber extends Contract {
     ): Promise<ContractTransaction>;
 
     checkBytesAndSendMultiWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "checkBytesAndSendMultiWETH(uint256,address[],bytes[],bytes[])"(
-      _bribeAmount: BigNumberish,
+    "checkBytesAndSendMultiWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address[],bytes[],bytes[])"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
@@ -224,33 +383,77 @@ export class MevBriber extends Contract {
     ): Promise<ContractTransaction>;
 
     checkBytesAndSendWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "checkBytesAndSendWETH(uint256,address,bytes,bytes)"(
-      _bribeAmount: BigNumberish,
+    "checkBytesAndSendWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address,bytes,bytes)"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    weth(
+    nonces(
+      owner: string,
       overrides?: CallOverrides
     ): Promise<{
-      0: string;
+      0: BigNumber;
     }>;
 
-    "weth()"(
+    "nonces(address)"(
+      owner: string,
       overrides?: CallOverrides
     ): Promise<{
-      0: string;
+      0: BigNumber;
     }>;
   };
+
+  PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
+
+  "PERMIT_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+
+  WETH(overrides?: CallOverrides): Promise<string>;
+
+  "WETH()"(overrides?: CallOverrides): Promise<string>;
+
+  briberPermitted(
+    owner: string,
+    spender: string,
+    value: BigNumberish,
+    deadline: BigNumberish,
+    v: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "briberPermitted(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+    owner: string,
+    spender: string,
+    value: BigNumberish,
+    deadline: BigNumberish,
+    v: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
 
   check32BytesAndSend(
     _target: string,
@@ -281,15 +484,27 @@ export class MevBriber extends Contract {
   ): Promise<ContractTransaction>;
 
   check32BytesAndSendMultiWETH(
-    _bribeAmount: BigNumberish,
+    _owner: string,
+    _spender: string,
+    _value: BigNumberish,
+    _deadline: BigNumberish,
+    _v: BigNumberish,
+    _r: BytesLike,
+    _s: BytesLike,
     _targets: string[],
     _payloads: BytesLike[],
     _resultMatches: BytesLike[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "check32BytesAndSendMultiWETH(uint256,address[],bytes[],bytes32[])"(
-    _bribeAmount: BigNumberish,
+  "check32BytesAndSendMultiWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address[],bytes[],bytes32[])"(
+    _owner: string,
+    _spender: string,
+    _value: BigNumberish,
+    _deadline: BigNumberish,
+    _v: BigNumberish,
+    _r: BytesLike,
+    _s: BytesLike,
     _targets: string[],
     _payloads: BytesLike[],
     _resultMatches: BytesLike[],
@@ -297,15 +512,27 @@ export class MevBriber extends Contract {
   ): Promise<ContractTransaction>;
 
   check32BytesAndSendWETH(
-    _bribeAmount: BigNumberish,
+    _owner: string,
+    _spender: string,
+    _value: BigNumberish,
+    _deadline: BigNumberish,
+    _v: BigNumberish,
+    _r: BytesLike,
+    _s: BytesLike,
     _target: string,
     _payload: BytesLike,
     _resultMatch: BytesLike,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "check32BytesAndSendWETH(uint256,address,bytes,bytes32)"(
-    _bribeAmount: BigNumberish,
+  "check32BytesAndSendWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address,bytes,bytes32)"(
+    _owner: string,
+    _spender: string,
+    _value: BigNumberish,
+    _deadline: BigNumberish,
+    _v: BigNumberish,
+    _r: BytesLike,
+    _s: BytesLike,
     _target: string,
     _payload: BytesLike,
     _resultMatch: BytesLike,
@@ -341,15 +568,27 @@ export class MevBriber extends Contract {
   ): Promise<ContractTransaction>;
 
   checkBytesAndSendMultiWETH(
-    _bribeAmount: BigNumberish,
+    _owner: string,
+    _spender: string,
+    _value: BigNumberish,
+    _deadline: BigNumberish,
+    _v: BigNumberish,
+    _r: BytesLike,
+    _s: BytesLike,
     _targets: string[],
     _payloads: BytesLike[],
     _resultMatches: BytesLike[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "checkBytesAndSendMultiWETH(uint256,address[],bytes[],bytes[])"(
-    _bribeAmount: BigNumberish,
+  "checkBytesAndSendMultiWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address[],bytes[],bytes[])"(
+    _owner: string,
+    _spender: string,
+    _value: BigNumberish,
+    _deadline: BigNumberish,
+    _v: BigNumberish,
+    _r: BytesLike,
+    _s: BytesLike,
     _targets: string[],
     _payloads: BytesLike[],
     _resultMatches: BytesLike[],
@@ -357,26 +596,71 @@ export class MevBriber extends Contract {
   ): Promise<ContractTransaction>;
 
   checkBytesAndSendWETH(
-    _bribeAmount: BigNumberish,
+    _owner: string,
+    _spender: string,
+    _value: BigNumberish,
+    _deadline: BigNumberish,
+    _v: BigNumberish,
+    _r: BytesLike,
+    _s: BytesLike,
     _target: string,
     _payload: BytesLike,
     _resultMatch: BytesLike,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "checkBytesAndSendWETH(uint256,address,bytes,bytes)"(
-    _bribeAmount: BigNumberish,
+  "checkBytesAndSendWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address,bytes,bytes)"(
+    _owner: string,
+    _spender: string,
+    _value: BigNumberish,
+    _deadline: BigNumberish,
+    _v: BigNumberish,
+    _r: BytesLike,
+    _s: BytesLike,
     _target: string,
     _payload: BytesLike,
     _resultMatch: BytesLike,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  weth(overrides?: CallOverrides): Promise<string>;
+  nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "weth()"(overrides?: CallOverrides): Promise<string>;
+  "nonces(address)"(
+    owner: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   callStatic: {
+    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
+
+    "PERMIT_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+
+    WETH(overrides?: CallOverrides): Promise<string>;
+
+    "WETH()"(overrides?: CallOverrides): Promise<string>;
+
+    briberPermitted(
+      owner: string,
+      spender: string,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "briberPermitted(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+      owner: string,
+      spender: string,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     check32BytesAndSend(
       _target: string,
       _payload: BytesLike,
@@ -406,15 +690,27 @@ export class MevBriber extends Contract {
     ): Promise<void>;
 
     check32BytesAndSendMultiWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "check32BytesAndSendMultiWETH(uint256,address[],bytes[],bytes32[])"(
-      _bribeAmount: BigNumberish,
+    "check32BytesAndSendMultiWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address[],bytes[],bytes32[])"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
@@ -422,15 +718,27 @@ export class MevBriber extends Contract {
     ): Promise<void>;
 
     check32BytesAndSendWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "check32BytesAndSendWETH(uint256,address,bytes,bytes32)"(
-      _bribeAmount: BigNumberish,
+    "check32BytesAndSendWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address,bytes,bytes32)"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
@@ -466,15 +774,27 @@ export class MevBriber extends Contract {
     ): Promise<void>;
 
     checkBytesAndSendMultiWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "checkBytesAndSendMultiWETH(uint256,address[],bytes[],bytes[])"(
-      _bribeAmount: BigNumberish,
+    "checkBytesAndSendMultiWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address[],bytes[],bytes[])"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
@@ -482,29 +802,80 @@ export class MevBriber extends Contract {
     ): Promise<void>;
 
     checkBytesAndSendWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "checkBytesAndSendWETH(uint256,address,bytes,bytes)"(
-      _bribeAmount: BigNumberish,
+    "checkBytesAndSendWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address,bytes,bytes)"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    weth(overrides?: CallOverrides): Promise<string>;
+    nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "weth()"(overrides?: CallOverrides): Promise<string>;
+    "nonces(address)"(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
-  filters: {};
+  filters: {
+    Bribed(
+      briber: string | null,
+      miner: string | null,
+      amount: null
+    ): EventFilter;
+  };
 
   estimateGas: {
+    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "PERMIT_TYPEHASH()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    WETH(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "WETH()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    briberPermitted(
+      owner: string,
+      spender: string,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "briberPermitted(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+      owner: string,
+      spender: string,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     check32BytesAndSend(
       _target: string,
       _payload: BytesLike,
@@ -534,15 +905,27 @@ export class MevBriber extends Contract {
     ): Promise<BigNumber>;
 
     check32BytesAndSendMultiWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "check32BytesAndSendMultiWETH(uint256,address[],bytes[],bytes32[])"(
-      _bribeAmount: BigNumberish,
+    "check32BytesAndSendMultiWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address[],bytes[],bytes32[])"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
@@ -550,15 +933,27 @@ export class MevBriber extends Contract {
     ): Promise<BigNumber>;
 
     check32BytesAndSendWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "check32BytesAndSendWETH(uint256,address,bytes,bytes32)"(
-      _bribeAmount: BigNumberish,
+    "check32BytesAndSendWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address,bytes,bytes32)"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
@@ -594,15 +989,27 @@ export class MevBriber extends Contract {
     ): Promise<BigNumber>;
 
     checkBytesAndSendMultiWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "checkBytesAndSendMultiWETH(uint256,address[],bytes[],bytes[])"(
-      _bribeAmount: BigNumberish,
+    "checkBytesAndSendMultiWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address[],bytes[],bytes[])"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
@@ -610,27 +1017,74 @@ export class MevBriber extends Contract {
     ): Promise<BigNumber>;
 
     checkBytesAndSendWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "checkBytesAndSendWETH(uint256,address,bytes,bytes)"(
-      _bribeAmount: BigNumberish,
+    "checkBytesAndSendWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address,bytes,bytes)"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    weth(overrides?: CallOverrides): Promise<BigNumber>;
+    nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "weth()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "nonces(address)"(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "PERMIT_TYPEHASH()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    WETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "WETH()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    briberPermitted(
+      owner: string,
+      spender: string,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "briberPermitted(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+      owner: string,
+      spender: string,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     check32BytesAndSend(
       _target: string,
       _payload: BytesLike,
@@ -660,15 +1114,27 @@ export class MevBriber extends Contract {
     ): Promise<PopulatedTransaction>;
 
     check32BytesAndSendMultiWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "check32BytesAndSendMultiWETH(uint256,address[],bytes[],bytes32[])"(
-      _bribeAmount: BigNumberish,
+    "check32BytesAndSendMultiWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address[],bytes[],bytes32[])"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
@@ -676,15 +1142,27 @@ export class MevBriber extends Contract {
     ): Promise<PopulatedTransaction>;
 
     check32BytesAndSendWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "check32BytesAndSendWETH(uint256,address,bytes,bytes32)"(
-      _bribeAmount: BigNumberish,
+    "check32BytesAndSendWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address,bytes,bytes32)"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
@@ -720,15 +1198,27 @@ export class MevBriber extends Contract {
     ): Promise<PopulatedTransaction>;
 
     checkBytesAndSendMultiWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "checkBytesAndSendMultiWETH(uint256,address[],bytes[],bytes[])"(
-      _bribeAmount: BigNumberish,
+    "checkBytesAndSendMultiWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address[],bytes[],bytes[])"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _targets: string[],
       _payloads: BytesLike[],
       _resultMatches: BytesLike[],
@@ -736,23 +1226,41 @@ export class MevBriber extends Contract {
     ): Promise<PopulatedTransaction>;
 
     checkBytesAndSendWETH(
-      _bribeAmount: BigNumberish,
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "checkBytesAndSendWETH(uint256,address,bytes,bytes)"(
-      _bribeAmount: BigNumberish,
+    "checkBytesAndSendWETH(address,address,uint256,uint256,uint8,bytes32,bytes32,address,bytes,bytes)"(
+      _owner: string,
+      _spender: string,
+      _value: BigNumberish,
+      _deadline: BigNumberish,
+      _v: BigNumberish,
+      _r: BytesLike,
+      _s: BytesLike,
       _target: string,
       _payload: BytesLike,
       _resultMatch: BytesLike,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    weth(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    nonces(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
-    "weth()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "nonces(address)"(
+      owner: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
   };
 }
