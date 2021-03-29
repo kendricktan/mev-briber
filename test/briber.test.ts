@@ -74,7 +74,7 @@ const getFuture = async () => {
 };
 
 describe("MEV Briber", function () {
-  it("Should be able to bribe", async function () {
+  it("Bribe logic", async function () {
     const userThatCanSign = ethers.Wallet.createRandom().connect(
       ethers.provider
     );
@@ -133,5 +133,23 @@ describe("MEV Briber", function () {
     expect(txResp.logs[2].topics[2].toLowerCase()).to.be.include(
       blockData.miner.slice(2).toLowerCase()
     );
+
+    try {
+      await briber.check32BytesAndSendWETH(
+        userThatCanSign.address,
+        briber.address,
+        bribeAmount,
+        deadline,
+        signature.v,
+        signature.r,
+        signature.s,
+        target,
+        payload,
+        resultMatch
+      );
+      throw new Error("Cannot use same nonce twice");
+    } catch (e) {
+      expect(e.toString()).to.include('invalid signature')
+    }
   });
 });
